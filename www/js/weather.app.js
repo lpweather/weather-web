@@ -15,6 +15,9 @@ WEATHER = { };
 })();
 
 WEATHER.app = (function () {
+
+  var mapsStyle = [{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#444444"}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#f2f2f2"}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"all","stylers":[{"saturation":-100},{"lightness":45}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#46bcec"},{"visibility":"on"}]}];
+
   return {
     /**
      * Draws a simple line chart with the temperature data
@@ -51,7 +54,7 @@ WEATHER.app = (function () {
           .y(function(d) { return y(d.close); });
 
       // Adds the svg canvas
-      var svg = d3.select("body")
+      var svg = d3.select("#graph-container")
           .append("svg")
               .attr("width", width + margin.left + margin.right)
               .attr("height", height + margin.top + margin.bottom)
@@ -79,14 +82,51 @@ WEATHER.app = (function () {
     },
     map: function () {
       function initializeMap() {
+        var myLatlng = {lat: 47.3846794, lng: 8.5329564};
+
         var mapCanvas = document.getElementById('map');
         var mapOptions = {
-            center: new google.maps.LatLng(44.22, 8.33),
-            zoom: 8,
+            center: new google.maps.LatLng(47.3846794, 8.5329564),
+            zoom: 12,
+            styles: mapsStyle,
+            zoomControl: false,
+            mapTypeControl: false,
+            scaleControl: false,
+            streetViewControl: false,
+            rotateControl: false,
             mapTypeId: google.maps.MapTypeId.ROADMAP // Options: ROADMAP, SATELLITE, HYBRID, TERRAIN
         }
+
         var map = new google.maps.Map(mapCanvas, mapOptions);
+
+        var marker = new google.maps.Marker({
+          position: myLatlng,
+          map: map,
+          title: 'Weather station @ Impact Hub'
+        });
+
+        /*map.addListener('center_changed', function() {
+          // 3 seconds after the center of the map has changed, pan back to the
+          // marker.
+          window.setTimeout(function() {
+            map.panTo(marker.getPosition());
+          }, 3000);
+        });*/
+
+        marker.addListener('click', function() {
+          map.setZoom(14);
+          map.setCenter(marker.getPosition());
+
+          $('.maximize.overlay').addClass('visible');
+
+          $('.close').click(function () {
+            if ($('.maximize.overlay').hasClass('visible')) {
+              $('.maximize.overlay').removeClass('visible');
+            }
+          });
+        });
       }
+
       google.maps.event.addDomListener(window, 'load', initializeMap);
     }
   };
