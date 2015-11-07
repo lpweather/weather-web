@@ -114,11 +114,12 @@ def graph_data(deveui):
         .where(Sensor.deveuid == deveui)
         .get())
     def generate():
+        yield 'date,close\n'
         for measurement in data.measurements:
             if measurement.type == 'temparature':
                 yield '{0}, {1}\n'.format(
                     measurement.timestamp.strftime("%d %b %Y - %H:%m"),
-                    measurement.value)
+                    dafuqnumber(measurement.value))
     return Response(generate(), mimetype='text/csv')
 
 @app.route('/lazy_setup')
@@ -129,6 +130,14 @@ def lazy_setup():
     '''
     db.connect()
     create_tables()
+
+def dafuqnumber(value):
+    q1 = int('0x{0}'.format(value[0:2]), 0)
+    q2 = int('0x{0}'.format(value[2:4]), 0)
+    q3 = int('0x{0}'.format(value[4:6]), 0)
+    q4 = int('0x{0}'.format(value[6:8]), 0)
+    return float('{0}{1}.{2}{3}'.format(q1, q2, q3, q4))
+
 
 @app.before_request
 def before_request():

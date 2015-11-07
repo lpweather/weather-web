@@ -25,7 +25,7 @@ WEATHER.app = (function () {
      * @param data {String}
      *  Path to the csv file to load
      */
-    graph: function (data) {
+    graph: function (path) {
       // Set the dimensions of the canvas / graph
       var margin = {top: 30, right: 20, bottom: 400, left: 50},
           width = ($('body').width() - 50) - margin.left - margin.right,
@@ -35,7 +35,7 @@ WEATHER.app = (function () {
       console.log($('body').height());
 
       // Parse the date / time
-      var parseDate = d3.time.format("%d-%b-%y").parse;
+      var parseDate = d3.time.format("%d %b %Y - %H:%m").parse;
 
       // Set the ranges
       var x = d3.time.scale().range([0, width]);
@@ -63,7 +63,7 @@ WEATHER.app = (function () {
                     "translate(" + margin.left + "," + margin.top + ")");
 
       // Get the data
-      d3.csv(data, function(error, data) {
+      d3.csv(path, function(error, data) {
           data.forEach(function(d) {
               d.date = parseDate(d.date);
               d.close = +d.close;
@@ -102,15 +102,19 @@ WEATHER.app = (function () {
         var marker = new google.maps.Marker({
           position: myLatlng,
           map: map,
-          title: 'Weather station @ Impact Hub'
+          title: 'Weather station @ Impact Hub',
+          metadata: {
+            devid: 'F03D291000001600'
+          }
         });
 
         marker.addListener('click', function() {
           map.setZoom(14);
           map.setCenter(marker.getPosition());
 
-          $('.maximize.overlay').addClass('visible');
+          WEATHER.app.graph('/' + marker.metadata.devid + '.csv');
 
+          $('.maximize.overlay').addClass('visible');
           $('.close').click(function () {
             if ($('.maximize.overlay').hasClass('visible')) {
               $('.maximize.overlay').removeClass('visible');

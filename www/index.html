@@ -12,6 +12,9 @@
 
   <script src="js/weather.app.js"></script>
   <script src="http://d3js.org/d3.v3.min.js"></script>
+
+  <script src="js/chartist.js"></script>
+  <link rel="stylesheet" href="chartist.min.css" />
 </head>
 <body class="maximize" ng-controller="WeatherController as weather">
   <div class="maximize overlay">
@@ -27,7 +30,7 @@
   $(document).ready(function () {
     var date = new Date().toTimeString().split(' ')[0].split(':');
     $('#time').text(date[0] + ':' + date[1]);
-    WEATHER.app.graph('js/data.csv');
+    //WEATHER.app.graph('');
     WEATHER.app.map();
   })
 </script>
