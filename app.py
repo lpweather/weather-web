@@ -24,6 +24,13 @@ def send_js(path):
     '''
     return send_from_directory('www/js/', path)
 
+@app.route('/css/<path:path>')
+def send_css(path):
+    '''
+        Serves static style sheets
+    '''
+    return send_from_directory('www/css/', path)
+
 @app.route('/weather_data', methods=['POST'])
 def weather_data():
     '''
@@ -31,7 +38,7 @@ def weather_data():
     '''
     xml = ElementTree.fromstring(request.data).getroot()
     print(xml)
-    return  jsonify({'message': 'OK'})
+    return  jsonify({'message': str(xml)})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port)
