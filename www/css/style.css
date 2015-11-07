@@ -23,3 +23,18 @@ h1 {
   top: 50px;
   right: 140px;
 }
+
+.maximize {
+  width: 100%;
+}
+
+.maximize.overlay {
+   z-index: 0;
+    position: fixed;
+    padding: 20px;
+    background: rgba(27, 27, 27, 0.73);
+}
+
+.maximize.overlay.visible {
+  z-index: 1;
+}
