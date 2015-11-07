@@ -4,7 +4,10 @@ import datetime
 from flask import (Flask,
     send_from_directory,
     request, jsonify, g)
-from database import db, Sensor, Measurement, create_tables
+from database import (db, Sensor,
+    Measurement,
+    create_tables,
+    list_to_dict)
 import xml.etree.ElementTree as ElementTree
 import os
 
@@ -82,9 +85,44 @@ def weather_data():
 
     return jsonify({'message': str(xml)})
 
+@app.route('/sensors')
+def sensors():
+    '''
+        Returns all weather nodes
+    '''
+    return jsonify(list_to_dict(Sensor.get()))
+
+@app.route('/measurements/<deveui>')
+def measurements(deveui):
+    print(deveui)
+
+    u = (Sensor.select(Sensor, Measurement)
+        .join(Measurement)
+        .where(Sensor.deveuid == deveui)
+        .get())
+
+
+
+    '''u = (Measurement
+        .select(Measurement, Sensor)
+        .join(Sensor)
+        .where(
+            Sensor.deveuid == deveui
+        ).aggregate_rows())'''
+
+    print(u)
+    print(u.__dict__)
+
+
+    print (u)
+
+    return jsonify(list_to_dict(u
+    ))
+
 @app.route('/lazy_setup')
 def lazy_setup():
     '''
+        !! CAREFULL !!
         Lazy setup to create the database connection
     '''
     db.connect()

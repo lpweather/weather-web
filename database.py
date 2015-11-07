@@ -1,6 +1,7 @@
 import os
 import json
 from peewee import *
+from playhouse.shortcuts import model_to_dict
 
 # read config from environement or use fallback
 env = os.environ.get('VCAP_SERVICES')
@@ -52,3 +53,19 @@ def create_tables():
     '''
     db.connect()
     db.create_tables([Sensor, Measurement])
+
+def list_to_dict(models):
+    '''
+        Converts a list of models
+        to dictionarys which can be converted
+        to json.
+    '''
+
+    model_list = {'items': []}
+    if not isinstance(models, list):
+        model_list['items'].append(model_to_dict(models, backrefs=True))
+    else:
+        for model in models:
+            model_list['items'].append(model_to_dict(model, backrefs=True))
+
+    return model_list
