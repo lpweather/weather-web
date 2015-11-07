@@ -1,4 +1,6 @@
 import os
+import re
+import datetime
 from flask import (Flask,
     send_from_directory,
     request, jsonify, g)
@@ -47,7 +49,8 @@ def weather_data():
         the 'xx' values represent a number in the format of
         'xxxx.xxxx' (four digits bevore the and four after the dot)
     '''
-    xml = ElementTree.fromstring(request.data)
+    # remove namespace for parsing
+    xml = ElementTree.fromstring(re.sub(' xmlns="[^"]+"', '', request.data, count=1))
 
     measurement = {
         'deveui': None,
@@ -60,20 +63,22 @@ def weather_data():
         '02': 'light' }
 
     for child in xml:
-        if child.tag in measurement:
+        print(child.tag.lower())
+        if child.tag.lower() in measurement:
+            print('added {0}'.format(child.text))
             measurement[child.tag.lower()] = child.text
 
-    sensor = Sensor.get_or_create(Sensor.deveuid == measurement['deveui'])
-    if not sensor.id:
-        sensor.deveuid = measurement['deveui']
-        # TODO: read value from device
-        sensor.location = '47.3846794:8.5329564'
+    sensor, created = Sensor.get_or_create(
+        deveuid=measurement['deveui'],
+        position='47.3846794:8.5329564')
 
     Measurement.create(
-        timestamp=datetime.datetime.strptime(measurement['time']),
+        timestamp=datetime.datetime.strptime(measurement['time'][:19], '%Y-%m-%dT%H:%M:%S'),
         type=measurement_type_map[measurement['payload_hex'][:2]],
-        value=measurement_type_map[measurement['payload_hex'][2:]],
+        value=measurement['payload_hex'][2:],
         sensor=sensor).save()
+
+    sensor.save()
 
     return jsonify({'message': str(xml)})
 
