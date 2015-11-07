@@ -1,3 +1,4 @@
 flask
 peewee
 pymysql
+mysql-connector-python

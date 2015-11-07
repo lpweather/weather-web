@@ -1,16 +1,24 @@
+import os
+import json
 from peewee import *
 
-db = MySQLDatabase('LowPowerWeatherDB', user='user', passwd='user')
+credentials = json.loads(os.environ.get('VCAP_SERVICES'))
+print(credentials)
+db = MySQLDatabase(credentials['mariadb'][0]['credentials']['database'],
+    host=credentials['mariadb'][0]['credentials']['host'],
+    port=credentials['mariadb'][0]['credentials']['port'],
+    user=credentials['mariadb'][0]['credentials']['username'],
+    passwd=credentials['mariadb'][0]['credentials']['password'])
 
 class Sensor(Model):
-    connected_since = DateTimeField()
+    deveuid = TextField()
     position = TextField()
 
     class Meta:
         database = db
 
 class Measurement(Model):
-    owner = ForeignKeyField(Sensor, related_name='measurements')
+    sensor = ForeignKeyField(Sensor, related_name='measurements')
     type = TextField()
     value = TextField()
     timestamp = DateTimeField()
