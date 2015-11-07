@@ -4,14 +4,22 @@ WEATHER = { };
 (function() {
   var app = angular.module('weather', []);
 
-  app.controller('WeatherController', function(){
-    this.product = info;
-  });
-
-  var info = {
-    temperature: 45.69,
-    location: "47°22′N 8°33′E",
-  };
+  app.controller('WeatherController', ['$scope', '$http', function ($scope, $http) {
+    $http({
+      method: 'GET',
+      url: '/sensors'
+    }).then(function successCallback(response) {
+      response.data.items.forEach(function(item) {
+        var positions = item.position.split(':');
+        var n = Number((parseFloat(positions[0])).toFixed(3));
+        var e = Number((parseFloat(positions[1])).toFixed(3));
+        $('#position').html("N: " + n + " E: " + e);
+        $('#station-name').html("(" + item.deveuid + ")");
+      }, function errorCallback(response) {
+        $('#position').html('error while getting position.');
+      });
+    });
+  }]);
 })();
 
 WEATHER.app = (function () {
@@ -82,8 +90,8 @@ WEATHER.app = (function () {
     },
     map: function () {
       function initializeMap() {
-        var myLatlng = {lat: 47.3846794, lng: 8.5329564};
 
+        // create map
         var mapCanvas = document.getElementById('map');
         var mapOptions = {
             center: new google.maps.LatLng(47.3846794, 8.5329564),
@@ -99,30 +107,32 @@ WEATHER.app = (function () {
 
         var map = new google.maps.Map(mapCanvas, mapOptions);
 
-        var marker = new google.maps.Marker({
-          position: myLatlng,
-          map: map,
-          title: 'Weather station @ Impact Hub',
-          metadata: {
-            devid: 'F03D291000001600'
-          }
-        });
+        // get data and create markers
+        $.get('/sensors', function (response) {
+          response.items.forEach(function(item) {
+            var positions = item.position.split(':');
+            var myLatlng = {lat: parseFloat(positions[0]), lng: parseFloat(positions[1])};
+            var marker = new google.maps.Marker({
+              position: myLatlng,
+              map: map,
+              title: 'Weather station ' + item.deveuid
+            });
 
-        marker.addListener('click', function() {
-          map.setZoom(14);
-          map.setCenter(marker.getPosition());
+            marker.addListener('click', function() {
+              //map.setZoom(14);
+              map.setCenter(marker.getPosition());
+              WEATHER.app.graph('/' + marker.metadata.devid + '.csv');
+              $('.maximize.overlay').addClass('visible');
 
-          WEATHER.app.graph('/' + marker.metadata.devid + '.csv');
-
-          $('.maximize.overlay').addClass('visible');
-          $('.close').click(function () {
-            if ($('.maximize.overlay').hasClass('visible')) {
-              $('.maximize.overlay').removeClass('visible');
-            }
+              $('.close').click(function () {
+                if ($('.maximize.overlay').hasClass('visible')) {
+                $('.maximize.overlay').removeClass('visible');
+                }
+              });
+            });
           });
         });
       }
-
       google.maps.event.addDomListener(window, 'load', initializeMap);
     }
   };

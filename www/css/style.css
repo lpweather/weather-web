@@ -1,7 +1,3 @@
-.maximize {
-  height: 100%;
-}
-
 path {
   stroke: #C4FF4E;
   stroke-width: 4px;
@@ -17,14 +13,15 @@ path {
   rendering: crispEdges;
 }
 
-h1 {
-  color: #888888;
+#time {
+  color: #1FCA04;
   position: absolute;
-  top: 50px;
   right: 140px;
+  font-size: 130px;
 }
 
 .maximize {
+  height: 100%;
   width: 100%;
 }
 
