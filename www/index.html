@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html ng-app="weather">
+<head>
+  <link rel="stylesheet" href="//bootswatch.com/cyborg/bootstrap.min.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
+  <script type="text/javascript" src="js/app.js"></script>
+</head>
+<body class="container" ng-controller="WeatherController as weather">
+  <h1>weather data</h1>
+  <p> {{ weather.product.location }} </p>
+  <p> {{ weather.product.temperature }} </p>
+</body>
+</html>
