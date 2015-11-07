@@ -11,8 +11,10 @@ WEATHER = { };
     }).then(function successCallback(response) {
       response.data.items.forEach(function(item) {
         var positions = item.position.split(':');
-        $('#position').html("Lon: " + positions[0] + " Lat: " + positions[1]);
-        $('#station-name').html(item.deveuid);
+        var n = Number((parseFloat(positions[0])).toFixed(3));
+        var e = Number((parseFloat(positions[1])).toFixed(3));
+        $('#position').html("N: " + n + " E: " + e);
+        $('#station-name').html("(" + item.deveuid + ")");
       }, function errorCallback(response) {
         $('#position').html('error while getting position.');
       });
@@ -115,22 +117,23 @@ WEATHER.app = (function () {
               map: map,
               title: 'Weather station ' + item.deveuid
             });
+
             marker.addListener('click', function() {
-            map.setZoom(14);
-            map.setCenter(marker.getPosition());
+              //map.setZoom(14);
+              map.setCenter(marker.getPosition());
 
-            $('.maximize.overlay').addClass('visible');
+              $('.maximize.overlay').addClass('visible');
 
-            $('.close').click(function () {
-              if ($('.maximize.overlay').hasClass('visible')) {
+              $('.close').click(function () {
+                if ($('.maximize.overlay').hasClass('visible')) {
                 $('.maximize.overlay').removeClass('visible');
-              }
+                }
+              });
             });
           });
         });
-      });
+      }
+      google.maps.event.addDomListener(window, 'load', initializeMap);
     }
-    google.maps.event.addDomListener(window, 'load', initializeMap);
-  }
-};
+  };
 })();

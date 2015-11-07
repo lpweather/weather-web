@@ -14,10 +14,10 @@ path {
 }
 
 #time {
-  color: #888888;
+  color: #1FCA04;
   position: absolute;
-  top: 50px;
   right: 140px;
+  font-size: 130px;
 }
 
 .maximize {
