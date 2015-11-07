@@ -1,0 +1,25 @@
+.maximize {
+  height: 100%;
+}
+
+path {
+  stroke: #A00016;
+  stroke-width: 2;
+  fill: none;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: grey;
+  stroke-width: 1;
+  shape-
+  rendering: crispEdges;
+}
+
+h1 {
+  color: #888888;
+  position: absolute;
+  top: 50px;
+  right: 140px;
+}
