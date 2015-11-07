@@ -3,7 +3,8 @@ import re
 import datetime
 from flask import (Flask,
     send_from_directory,
-    request, jsonify, g)
+    request, jsonify, g,
+    Response)
 from database import (db, Sensor,
     Measurement,
     create_tables,
@@ -94,30 +95,31 @@ def sensors():
 
 @app.route('/measurements/<deveui>')
 def measurements(deveui):
-    print(deveui)
-
-    u = (Sensor.select(Sensor, Measurement)
+    '''
+        Returns all measurements of a sensor node
+    '''
+    return jsonify(list_to_dict((Sensor.select(Sensor, Measurement)
         .join(Measurement)
         .where(Sensor.deveuid == deveui)
         .get())
-
-
-
-    '''u = (Measurement
-        .select(Measurement, Sensor)
-        .join(Sensor)
-        .where(
-            Sensor.deveuid == deveui
-        ).aggregate_rows())'''
-
-    print(u)
-    print(u.__dict__)
-
-
-    print (u)
-
-    return jsonify(list_to_dict(u
     ))
+
+@app.route('/<deveui>.csv/')
+def graph_data(deveui):
+    '''
+        Get simple csv data for a grap
+    '''
+    data = (Sensor.select(Sensor, Measurement)
+        .join(Measurement)
+        .where(Sensor.deveuid == deveui)
+        .get())
+    def generate():
+        for measurement in data.measurements:
+            if measurement.type == 'temparature':
+                yield '{0}, {1}\n'.format(
+                    measurement.timestamp.strftime("%d %b %Y - %H:%m"),
+                    measurement.value)
+    return Response(generate(), mimetype='text/csv')
 
 @app.route('/lazy_setup')
 def lazy_setup():
