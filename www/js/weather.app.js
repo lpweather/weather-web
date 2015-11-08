@@ -43,7 +43,7 @@ WEATHER.app = (function () {
 
       var options = {
         fullWidth: true,
-        height: 600,
+        height: 500,
         showArea: true,
         legendNames: ["Temperature", "Luminosity", "Light"],
         plugins: [
