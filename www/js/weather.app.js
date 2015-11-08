@@ -25,6 +25,56 @@ WEATHER = { };
 WEATHER.app = (function () {
 
   var mapsStyle = [{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#444444"}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#f2f2f2"}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"all","stylers":[{"saturation":-100},{"lightness":45}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#46bcec"},{"visibility":"on"}]}];
+  var chart;
+  var timeout;
+  var label = [],
+      temparature = [],
+      lumen = [],
+      light = [];
+
+
+  function updateChart(devid, callback) {
+    $.get('/' + devid, function (res) {
+
+      label = [];
+      temparature = [];
+      lumen = [];
+      light = [];
+
+      var options = {
+        fullWidth: true,
+        height: 700,
+        showArea: true
+      };
+
+      for (var i in res.data) {$
+        if (res.data[i].type == 'temparature') {
+          temparature.push(res.data[i].value);
+          label.push(res.data[i].timestamp)
+        }
+        if (res.data[i].type == 'lumen') {
+          lumen.push(res.data[i].value);
+        }
+        if (res.data[i].type == 'light') {
+          light.push(res.data[i].value);
+        }
+      }
+
+      // Create a simple line chart
+      var data = {
+        // A labels array that can contain any sort of values
+        labels: label,
+        // Our series array that contains series objects or in this case series data arrays
+        series: [
+          temparature,
+          lumen,
+          light
+        ]
+      };
+
+      callback(data, options);
+    });
+  }
 
   return {
     /**
@@ -33,60 +83,18 @@ WEATHER.app = (function () {
      * @param data {String}
      *  Path to the csv file to load
      */
-    graph: function (path) {
-      // Set the dimensions of the canvas / graph
-      var margin = {top: 30, right: 20, bottom: 400, left: 50},
-          width = ($('body').width() - 50) - margin.left - margin.right,
-          height = ($('body').height() - 50) - margin.top - margin.bottom;
+    graph: function (devid) {
 
-      console.log($('body').width());
-      console.log($('body').height());
-
-      // Parse the date / time
-      var parseDate = d3.time.format("%d %b %Y - %H:%m").parse;
-
-      // Set the ranges
-      var x = d3.time.scale().range([0, width]);
-      var y = d3.scale.linear().range([height, 0]);
-
-      // Define the axes
-      var xAxis = d3.svg.axis().scale(x)
-          .orient("bottom").ticks(5);
-
-      var yAxis = d3.svg.axis().scale(y)
-          .orient("left").ticks(5);
-
-      // Define the line
-      var valueline = d3.svg.line()
-          .x(function(d) { return x(d.date); })
-          .y(function(d) { return y(d.close); });
-
-      // Adds the svg canvas
-      var svg = d3.select("#graph-container")
-          .append("svg")
-              .attr("width", width + margin.left + margin.right)
-              .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-              .attr("transform",
-                    "translate(" + margin.left + "," + margin.top + ")");
-
-      // Get the data
-      d3.csv(path, function(error, data) {
-          data.forEach(function(d) {
-              d.date = parseDate(d.date);
-              d.close = +d.close;
+        timeout = setInterval(function () {
+          updateChart(devid, function(data, options) {
+            if (chart) {
+              chart.update(data, options);
+            } else {
+              chart = new Chartist.Line('#graph-container', data, options);
+            }
+            $('#ct-lables').remove();
           });
-
-          // Scale the range of the data
-          x.domain(d3.extent(data, function(d) { return d.date; }));
-          y.domain([0, d3.max(data, function(d) { return d.close; })]);
-
-          // Add the valueline path.
-          svg.append("path")
-              .attr("class", "line")
-              .attr("d", valueline(data));
-
-      });
+      }, 2000);
     },
     map: function () {
       function initializeMap() {
@@ -121,12 +129,15 @@ WEATHER.app = (function () {
             marker.addListener('click', function() {
               //map.setZoom(14);
               map.setCenter(marker.getPosition());
-              WEATHER.app.graph('/' + marker.metadata.devid + '.csv');
+
+              WEATHER.app.graph(item.deveuid);
+
               $('.maximize.overlay').addClass('visible');
 
               $('.close').click(function () {
+                clearTimeou(timeout);
                 if ($('.maximize.overlay').hasClass('visible')) {
-                $('.maximize.overlay').removeClass('visible');
+                  $('.maximize.overlay').removeClass('visible');
                 }
               });
             });

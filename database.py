@@ -52,6 +52,8 @@ def create_tables():
         Creates tables
     '''
     db.connect()
+    Measurement.delete().execute()
+    Sensor.delete().execute()
     db.create_tables([Sensor, Measurement])
 
 def list_to_dict(models):

@@ -4,6 +4,10 @@ path {
   fill: none;
 }
 
+.ct-grids {
+  visibility: hidden;
+}
+
 .axis path,
 .axis line {
   fill: none;
@@ -34,4 +38,12 @@ path {
 
 .maximize.overlay.visible {
   z-index: 1;
+}
+
+#graph-container {
+  bottom: 0px;
+}
+
+.ct-label {
+  display: none !important;
 }

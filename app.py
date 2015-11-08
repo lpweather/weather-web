@@ -104,23 +104,27 @@ def measurements(deveui):
         .get())
     ))
 
-@app.route('/<deveui>.csv/')
+@app.route('/<deveui>/')
 def graph_data(deveui):
     '''
         Get simple csv data for a grap
     '''
     data = (Sensor.select(Sensor, Measurement)
         .join(Measurement)
-        .where(Sensor.deveuid == deveui)
+        .where(
+            Sensor.deveuid == deveui &
+            Measurement.type == 'temparature')
         .get())
-    def generate():
-        yield 'date,close\n'
-        for measurement in data.measurements:
-            if measurement.type == 'temparature':
-                yield '{0}, {1}\n'.format(
-                    measurement.timestamp.strftime("%d %b %Y - %H:%m"),
-                    dafuqnumber(measurement.value))
-    return Response(generate(), mimetype='text/csv')
+
+    measurements = []
+    for messung in data.measurements:
+        measurements.append({
+            'timestamp': messung.timestamp,
+            'type': messung.type,
+            'value': dafuqnumber(messung.value)
+        })
+
+    return jsonify({'data': measurements})
 
 @app.route('/lazy_setup')
 def lazy_setup():
