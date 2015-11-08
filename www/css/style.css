@@ -47,3 +47,38 @@ path {
 .ct-label {
   display: none !important;
 }
+
+
+.ct-legend {
+    list-style: none;
+    padding:0;
+    margin:0;
+    position: absolute;
+    right: 100px;
+    padding-top: 20px;
+    font-size:  20px;
+}
+
+.ct-legend li {
+    color: white;
+}
+
+li {
+    padding-left: 1em;
+    text-indent: -.7em;
+}
+
+li.ct-series-0::before {
+  content: "• ";
+  color: #D70206;
+}
+
+li.ct-series-1::before {
+  content: "• ";
+  color: #F1664D;
+}
+
+li.ct-series-2::before {
+  content: "• ";
+  color: #F4C63D;
+}

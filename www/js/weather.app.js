@@ -43,8 +43,12 @@ WEATHER.app = (function () {
 
       var options = {
         fullWidth: true,
-        height: 700,
-        showArea: true
+        height: 600,
+        showArea: true,
+        legendNames: ["Temperature", "Luminosity", "Light"],
+        plugins: [
+            Chartist.plugins.legend()
+        ]
       };
 
       for (var i in res.data) {$
@@ -53,10 +57,10 @@ WEATHER.app = (function () {
           label.push(res.data[i].timestamp)
         }
         if (res.data[i].type == 'lumen') {
-          lumen.push(res.data[i].value);
+          lumen.push(res.data[i].value * 20);
         }
         if (res.data[i].type == 'light') {
-          light.push(res.data[i].value);
+          light.push(res.data[i].value * 10);
         }
       }
 
@@ -69,7 +73,8 @@ WEATHER.app = (function () {
           temparature,
           lumen,
           light
-        ]
+        ],
+        legendNames: ["Temperature", "Luminosity", "Light"]
       };
 
       callback(data, options);
@@ -135,7 +140,7 @@ WEATHER.app = (function () {
               $('.maximize.overlay').addClass('visible');
 
               $('.close').click(function () {
-                clearTimeou(timeout);
+                clearInterval(timeout);
                 if ($('.maximize.overlay').hasClass('visible')) {
                   $('.maximize.overlay').removeClass('visible');
                 }
