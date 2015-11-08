@@ -1,5 +1,6 @@
-<<<<<<< HEAD
 # **//** WEATHER-WEB
+
+Live demo: [lpw.scapp.io](http://lpw.scapp.io/)
 
 Web application for the low power weather project.
 
